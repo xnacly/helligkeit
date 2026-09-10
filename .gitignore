@@ -1,3 +1,8 @@
 brightnessctl
 *.swp
 config.mk
+
+
+# Added by cargo
+
+/target

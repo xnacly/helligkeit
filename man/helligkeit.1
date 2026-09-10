@@ -1,0 +1,37 @@
+.ie \n(.g .ds Aq \(aq
+.el .ds Aq '
+.TH helligkeit 1  "helligkeit 0.0.1-pre" 
+.SH NAME
+helligkeit \- Control device linux device brightness
+.SH SYNOPSIS
+\fBhelligkeit\fR [\fB\-s\fR|\fB\-\-silent\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] <\fIsubcommands\fR>
+.SH DESCRIPTION
+Control device linux device brightness
+.SH OPTIONS
+.TP
+\fB\-s\fR, \fB\-\-silent\fR
+disable stdout/stderr writes
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print help
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print version
+.SH SUBCOMMANDS
+.TP
+helligkeit\-info(1)
+Device(s) info
+.TP
+helligkeit\-get(1)
+Get current brightness of device
+.TP
+helligkeit\-set(1)
+Set device to value
+.TP
+helligkeit\-list(1)
+List all controllable and supported devices
+.TP
+helligkeit\-help(1)
+Print this message or the help of the given subcommand(s)
+.SH VERSION
+v0.0.1\-pre
