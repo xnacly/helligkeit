@@ -1,6 +1,6 @@
 # helligkeit
 
-Control device linux device brightness.
+Control linux device brightness.
 
 > helligkeit is a port/fork of brightness ctl with the aim of supporting more
 > features, modernising the project and porting pull requests and issues from
