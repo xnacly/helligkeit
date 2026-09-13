@@ -121,6 +121,7 @@ dependencies = [
  "clap",
  "clap_mangen",
  "helligkeit-ddc",
+ "helligkeit-dev",
  "helligkeit-edid",
 ]
 
@@ -130,6 +131,10 @@ version = "0.0.1"
 dependencies = [
  "helligkeit-i2c",
 ]
+
+[[package]]
+name = "helligkeit-dev"
+version = "0.0.1"
 
 [[package]]
 name = "helligkeit-edid"

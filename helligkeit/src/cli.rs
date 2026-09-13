@@ -5,16 +5,16 @@ use clap::{Parser, Subcommand};
 pub struct Cli {
     /// disable stdout/stderr writes
     #[arg(short, long)]
-    silent: bool,
+    pub silent: bool,
 
     #[command(subcommand)]
-    commands: Action,
+    pub command: Action,
 }
 
 #[derive(Subcommand)]
-enum Action {
-    /// Device(s) info
-    Info { device: Option<String> },
+pub enum Action {
+    /// Device info
+    Info { device: String },
     /// Get current brightness of device
     Get { device: String },
     /// Set device to value

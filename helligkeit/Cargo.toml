@@ -14,6 +14,7 @@ keywords = ["brightness", "led", "ddci", "linux"]
 clap = { version = "4.6.6", features = ["derive"] }
 helligkeit-ddc = { path = "../helligkeit-ddc" }
 helligkeit-edid = { path = "../helligkeit-edid" }
+helligkeit-dev = { path = "../helligkeit-dev" }
 
 [build-dependencies]
 clap = { version = "4.6.6", features = ["derive"] }
