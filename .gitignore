@@ -4,5 +4,4 @@ config.mk
 
 
 # Added by cargo
-
-/target
+target

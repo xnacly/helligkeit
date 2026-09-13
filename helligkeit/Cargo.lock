@@ -120,24 +120,7 @@ version = "0.0.1-pre"
 dependencies = [
  "clap",
  "clap_mangen",
- "helligkeit-ddc",
- "helligkeit-edid",
 ]
-
-[[package]]
-name = "helligkeit-ddc"
-version = "0.0.1"
-dependencies = [
- "helligkeit-i2c",
-]
-
-[[package]]
-name = "helligkeit-edid"
-version = "0.0.1"
-
-[[package]]
-name = "helligkeit-i2c"
-version = "0.0.1"
 
 [[package]]
 name = "is_terminal_polyfill"

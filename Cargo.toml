@@ -1,18 +1,3 @@
-[package]
-name = "helligkeit"
-version = "0.0.1-pre"
-edition = "2024"
-description = "Control device linux device brightness"
-repository = "https://github.com/xnacly/helligkeit"
-license = "MIT"
-readme = "README.md"
-
-categories = ["hardware-support"]
-keywords = ["brightness", "led", "ddci", "linux"]
-
-[dependencies]
-clap = { version = "4.6.6", features = ["derive"] }
-
-[build-dependencies]
-clap = { version = "4.6.6", features = ["derive"] }
-clap_mangen = "0.3.3"
+[workspace]
+resolver = "3"
+members = ["helligkeit", "helligkeit-ddc", "helligkeit-edid", "helligkeit-i2c"]

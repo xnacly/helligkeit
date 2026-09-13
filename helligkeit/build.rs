@@ -29,7 +29,7 @@ fn main() -> std::io::Result<()> {
         std::env::var_os("CARGO_MANIFEST_DIR").ok_or(std::io::ErrorKind::NotFound)?,
     );
 
-    project_root = project_root.join("man");
+    project_root = project_root.join("..").join("man");
     if project_root.exists() {
         std::fs::remove_dir_all(&project_root)?;
     }

@@ -1,0 +1,7 @@
+[package]
+name = "helligkeit-ddc"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+helligkeit-i2c = { path = "../helligkeit-i2c" }
