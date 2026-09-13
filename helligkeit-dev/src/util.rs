@@ -4,8 +4,8 @@ pub fn number_from_file<T: FromStr>(path: impl AsRef<Path>) -> io::Result<T> {
     let bytes = fs::read(path)?;
 
     str::from_utf8(&bytes)
-        .map_err(|_| io::Error::from(io::ErrorKind::InvalidData))?
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, "Invalid utf8 data in file"))?
         .trim()
         .parse()
-        .map_err(|_| io::Error::from(io::ErrorKind::InvalidData))
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, "Invalid number in file"))
 }

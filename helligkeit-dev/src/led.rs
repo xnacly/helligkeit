@@ -1,4 +1,11 @@
-use std::{fmt::Display, io, path::PathBuf};
+use std::{
+    fmt::Display,
+    fs,
+    io::{self, Write},
+    path::PathBuf,
+};
+
+use helligkeit_shared::Device;
 
 use crate::util;
 
@@ -12,18 +19,47 @@ pub struct Led {
     pub color: String,
     pub function: String,
     pub path: PathBuf,
-    pub brightness: u32,
     pub max_brightness: u32,
+}
+
+impl Device for Led {
+    fn name(&self) -> &str {
+        &self.devicename
+    }
+
+    fn get(&self) -> Result<u32, io::Error> {
+        util::number_from_file(self.path.join(BRIGHTNESS))
+    }
+
+    fn max(&self) -> io::Result<u32> {
+        Ok(self.max_brightness)
+    }
+
+    fn set(&self, b: u32) -> io::Result<()> {
+        if b > self.max_brightness {
+            if b > self.max_brightness {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "brightness exceeds max_brightness for the given device",
+                ));
+            }
+        }
+
+        let mut buf = Vec::with_capacity(16);
+        writeln!(buf, "{b}")?;
+        fs::write(self.path.join(BRIGHTNESS), buf)
+    }
 }
 
 impl Display for Led {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "[led] {}", self.devicename,)?;
+        let brightness = self.get().unwrap_or_default();
         writeln!(
             f,
             "\tCurrent brightness: {} ({}%)",
-            self.brightness,
-            (self.brightness * 100) / self.max_brightness
+            brightness,
+            (brightness * 100) / self.max_brightness
         )?;
         writeln!(f, "\tMax brightness: {}", self.max_brightness)
     }
@@ -55,14 +91,12 @@ impl TryFrom<PathBuf> for Led {
         );
 
         let max_brightness = util::number_from_file(path.join(MAX_BRIGHTNESS))?;
-        let brightness = util::number_from_file(path.join(BRIGHTNESS))?;
 
         Ok(Led {
             devicename,
             color,
             function,
             path,
-            brightness,
             max_brightness,
         })
     }

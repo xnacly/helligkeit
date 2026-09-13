@@ -123,6 +123,7 @@ dependencies = [
  "helligkeit-ddc",
  "helligkeit-dev",
  "helligkeit-edid",
+ "helligkeit-shared",
 ]
 
 [[package]]
@@ -130,11 +131,15 @@ name = "helligkeit-ddc"
 version = "0.0.1"
 dependencies = [
  "helligkeit-i2c",
+ "helligkeit-shared",
 ]
 
 [[package]]
 name = "helligkeit-dev"
 version = "0.0.1"
+dependencies = [
+ "helligkeit-shared",
+]
 
 [[package]]
 name = "helligkeit-edid"
@@ -143,6 +148,10 @@ version = "0.0.1"
 [[package]]
 name = "helligkeit-i2c"
 version = "0.0.1"
+
+[[package]]
+name = "helligkeit-shared"
+version = "0.1.0"
 
 [[package]]
 name = "is_terminal_polyfill"

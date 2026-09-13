@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 helligkeit-i2c = { path = "../helligkeit-i2c" }
+helligkeit-shared = { path = "../helligkeit-shared" }
