@@ -1,8 +1,11 @@
-use std::io;
+use std::{fmt::Display, io};
 
-pub trait Device {
+pub trait Device: Display {
     fn name(&self) -> &str;
-    fn get(&self) -> io::Result<u32>;
-    fn max(&self) -> io::Result<u32>;
-    fn set(&self, b: u32) -> io::Result<()>;
+    /// get brightness
+    fn get(&self) -> io::Result<usize>;
+    /// get max brightness
+    fn max(&self) -> io::Result<usize>;
+    /// set brightness
+    fn set(&self, b: usize) -> io::Result<()>;
 }

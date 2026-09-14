@@ -4,13 +4,22 @@
 .SH NAME
 helligkeit \- Control device linux device brightness
 .SH SYNOPSIS
-\fBhelligkeit\fR [\fB\-s\fR|\fB\-\-silent\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] <\fIsubcommands\fR>
+\fBhelligkeit\fR [\fB\-l\fR|\fB\-\-like\fR] [\fB\-s\fR|\fB\-\-silent\fR] [\fB\-v\fR|\fB\-\-verbose\fR] [\fB\-h\fR|\fB\-\-help\fR] [\fB\-V\fR|\fB\-\-version\fR] <\fB\-t\fR|\fB\-\-target\fR> [\fIsubcommands\fR]
 .SH DESCRIPTION
 Control device linux device brightness
 .SH OPTIONS
 .TP
+\fB\-t\fR, \fB\-\-target\fR \fI<TARGET>\fR
+device to operate on
+.TP
+\fB\-l\fR, \fB\-\-like\fR
+Match devices by substring matching
+.TP
 \fB\-s\fR, \fB\-\-silent\fR
 disable stdout/stderr writes
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 Print help

@@ -1,25 +1,31 @@
 //! Display Data Channel abstraction, see https://en.wikipedia.org/wiki/Display_Data_Channel and https://milek7.pl/ddcbacklight/mccs.pdf
 
-use std::io;
+use std::{fmt::Display, io};
 
 use helligkeit_shared::Device;
 
 pub struct Ddc {}
+
+impl Display for Ddc {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "ddc")
+    }
+}
 
 impl Device for Ddc {
     fn name(&self) -> &str {
         todo!()
     }
 
-    fn get(&self) -> std::io::Result<u32> {
+    fn get(&self) -> std::io::Result<usize> {
         todo!()
     }
 
-    fn set(&self, b: u32) -> std::io::Result<()> {
+    fn set(&self, b: usize) -> std::io::Result<()> {
         todo!()
     }
 
-    fn max(&self) -> io::Result<u32> {
+    fn max(&self) -> io::Result<usize> {
         todo!()
     }
 }

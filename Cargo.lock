@@ -122,7 +122,6 @@ dependencies = [
  "clap_mangen",
  "helligkeit-ddc",
  "helligkeit-dev",
- "helligkeit-edid",
  "helligkeit-shared",
 ]
 
@@ -140,10 +139,6 @@ version = "0.0.1"
 dependencies = [
  "helligkeit-shared",
 ]
-
-[[package]]
-name = "helligkeit-edid"
-version = "0.0.1"
 
 [[package]]
 name = "helligkeit-i2c"
