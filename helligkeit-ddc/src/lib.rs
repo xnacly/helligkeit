@@ -3,6 +3,7 @@
 use std::{fmt::Display, io, path::Path};
 
 use helligkeit_shared::Device;
+pub mod edid;
 
 pub struct Edid {
     name: String,
