@@ -1,3 +1,9 @@
 [workspace]
 resolver = "3"
-members = ["helligkeit", "helligkeit-ddc", "helligkeit-dev",  "helligkeit-i2c", "helligkeit-shared"]
+members = [
+    "helligkeit",
+    "helligkeit-ddc",
+    "helligkeit-dev",
+    "helligkeit-i2c",
+    "helligkeit-shared",
+]

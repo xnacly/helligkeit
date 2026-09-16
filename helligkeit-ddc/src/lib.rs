@@ -1,10 +1,26 @@
 //! Display Data Channel abstraction, see https://en.wikipedia.org/wiki/Display_Data_Channel and https://milek7.pl/ddcbacklight/mccs.pdf
 
-use std::{fmt::Display, io};
+use std::{fmt::Display, io, path::Path};
 
 use helligkeit_shared::Device;
 
-pub struct Ddc {}
+pub struct Edid {
+    name: String,
+}
+
+pub struct Ddc {
+    dev: helligkeit_i2c::Dev,
+    /// cached edid fetched at [Ddc::dev] creation time
+    edid: Edid,
+    /// cached max fetched at [Ddc::dev] creation time
+    max: usize,
+}
+
+impl Ddc {
+    pub fn new(path: impl AsRef<Path>) -> std::io::Result<Self> {
+        todo!()
+    }
+}
 
 impl Display for Ddc {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -14,7 +30,7 @@ impl Display for Ddc {
 
 impl Device for Ddc {
     fn name(&self) -> &str {
-        todo!()
+        &self.edid.name
     }
 
     fn get(&self) -> std::io::Result<usize> {
@@ -26,7 +42,7 @@ impl Device for Ddc {
     }
 
     fn max(&self) -> io::Result<usize> {
-        todo!()
+        Ok(self.max)
     }
 }
 

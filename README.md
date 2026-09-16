@@ -35,6 +35,18 @@ for users in `video` and leds for users in `input`.
 
 ## Usage
 
+See [man](./man)
+
+## Project structure
+
+Helligkeit is split into 5 crates:
+
+- [ddc]()
+- [shared]()
+- [i2c]()
+- [dev]()
+- [helligkeit]()
+
 ## Name
 
 Helligkeit is german for brightness.
