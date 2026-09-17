@@ -9,3 +9,7 @@ pub fn number_from_file<T: FromStr>(path: impl AsRef<Path>) -> io::Result<T> {
         .parse()
         .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, "Invalid number in file"))
 }
+
+pub fn percent(value: usize, max: usize) -> usize {
+    if max == 0 { 0 } else { (value * 100) / max }
+}

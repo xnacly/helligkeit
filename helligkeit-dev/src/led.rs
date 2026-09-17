@@ -35,12 +35,10 @@ impl Device for Led {
 
     fn set(&self, b: usize) -> io::Result<()> {
         if b > self.max_brightness {
-            if b > self.max_brightness {
-                return Err(io::Error::new(
-                    io::ErrorKind::InvalidInput,
-                    "brightness exceeds max_brightness for the given device",
-                ));
-            }
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "brightness exceeds max_brightness for the given device",
+            ));
         }
 
         let mut buf = Vec::with_capacity(16);
@@ -57,7 +55,7 @@ impl Display for Led {
             f,
             "\tCurrent brightness: {} ({}%)",
             brightness,
-            (brightness * 100) / self.max_brightness
+            util::percent(brightness, self.max_brightness)
         )?;
         writeln!(f, "\tMax brightness: {}", self.max_brightness)
     }
