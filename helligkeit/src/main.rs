@@ -1,7 +1,7 @@
-use std::{collections::HashMap, io, process};
+use std::{io, process};
 
 use clap::Parser;
-use helligkeit_shared::Device;
+use helligkeit_shared::{Device, IRRELEVANT};
 
 mod cli;
 
@@ -13,34 +13,57 @@ fn die(msg: impl std::fmt::Display) -> ! {
 struct Helligkeit<'h> {
     args: &'h cli::Cli,
     target: String,
-    devices: HashMap<String, Box<dyn Device>>,
+    /// all devices sorted by (class, rank, name)
+    devices: Vec<Box<dyn Device>>,
 }
 
 impl<'h> Helligkeit<'h> {
     pub fn new(args: &'h cli::Cli) -> Self {
-        let leds = helligkeit_dev::leds().expect("Failed to enumerate leds");
-        let backlight = helligkeit_dev::backlight().expect("Failed to enumerate backlights");
-        // let ddc = helligkeit_ddc::ddc().expect("Failed to enumerate ddc devices");
         let verbose = args.verbose;
+        let report = |err: io::Error| {
+            if verbose {
+                eprintln!("failed to enumerate device: {err}");
+            }
+        };
+
+        let backlights = helligkeit_dev::backlight()
+            .expect("Failed to enumerate backlights")
+            .map(|r| r.map(|x| Box::new(x) as Box<dyn Device>));
+        let leds = helligkeit_dev::leds()
+            .expect("Failed to enumerate leds")
+            .map(|r| r.map(|x| Box::new(x) as Box<dyn Device>));
+        // let ddc = helligkeit_ddc::ddc()
+        //     .expect("Failed to enumerate ddc devices")
+        //     .map(|r| r.map(|x| Box::new(x) as Box<dyn Device>));
+
+        let mut devices: Vec<Box<dyn Device>> = backlights
+            .chain(leds)
+            // .chain(ddc)
+            .filter_map(|r| r.map_err(report).ok())
+            .collect();
+        devices.sort_by_cached_key(|d| helligkeit_shared::sort_key(d.as_ref()));
+
+        if verbose {
+            for d in &devices {
+                let rank = d.rank();
+                eprintln!(
+                    "{}: {} rank {}{}",
+                    d.name(),
+                    d.class(),
+                    rank,
+                    if rank >= IRRELEVANT {
+                        ", irrelevant"
+                    } else {
+                        ""
+                    }
+                );
+            }
+        }
 
         Self {
             args,
             target: args.target.clone().unwrap_or_default(),
-            devices: leds
-                .map(|x| x.map(|x| Box::new(x) as Box<dyn Device>))
-                .chain(backlight.map(|x| x.map(|x| Box::new(x) as Box<dyn Device>)))
-                // .chain(ddc.map(|x| x.map(|x| Box::new(x) as Box<dyn Device>)))
-                .filter_map(|result| match result {
-                    Ok(device) => Some(device),
-                    Err(err) => {
-                        if verbose {
-                            eprintln!("failed to enumerate device: {err}");
-                        }
-                        None
-                    }
-                })
-                .map(|device| (device.name().to_owned(), device))
-                .collect(),
+            devices,
         }
     }
 
@@ -50,12 +73,12 @@ impl<'h> Helligkeit<'h> {
         if *like {
             self.devices
                 .iter()
-                .filter(|(name, _)| name.contains(&self.target))
-                .map(|(_, d)| d)
+                .filter(|d| d.name().contains(&self.target))
                 .collect()
         } else {
             self.devices
-                .get(&self.target)
+                .iter()
+                .find(|d| d.name() == self.target)
                 .map(|d| vec![d])
                 .unwrap_or_default()
         }
@@ -90,7 +113,17 @@ impl<'h> Helligkeit<'h> {
     }
 
     fn list(&self) {
-        self.devices.values().for_each(|d| println!("{d}"))
+        let relevant = |d: &&Box<dyn Device>| self.args.verbose || d.rank() < IRRELEVANT;
+
+        self.devices
+            .iter()
+            .filter(relevant)
+            .for_each(|d| println!("{d}"));
+
+        let hidden = self.devices.iter().filter(|d| !relevant(d)).count();
+        if hidden > 0 {
+            eprintln!("{hidden} possibly irrelevant devices hidden, use --verbose/-v to see all");
+        }
     }
 
     fn set(&self, adjust: cli::Adjust) {
