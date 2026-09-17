@@ -3,3 +3,5 @@ ACTION=="add", SUBSYSTEM=="backlight", RUN+="/bin/chgrp video /sys/class/backlig
 ACTION=="add", SUBSYSTEM=="backlight", RUN+="/bin/chmod g+w /sys/class/backlight/%k/brightness"
 ACTION=="add", SUBSYSTEM=="leds", RUN+="/bin/chgrp input /sys/class/leds/%k/brightness"
 ACTION=="add", SUBSYSTEM=="leds", RUN+="/bin/chmod g+w /sys/class/leds/%k/brightness"
+# /dev/i2c-* nodes used for DDC/CI (external monitors), see ddcutil's 45-ddcutil-i2c.rules
+KERNEL=="i2c-[0-9]*", SUBSYSTEM=="i2c-dev", GROUP="video", MODE="0660"
