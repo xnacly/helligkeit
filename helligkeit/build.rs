@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use clap::CommandFactory;
 
 #[path = "src/cli.rs"]
+#[allow(dead_code)]
 mod cli;
 
 fn render_man_page(root: &PathBuf, name: &'static str, cmd: clap::Command) -> std::io::Result<()> {

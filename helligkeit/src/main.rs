@@ -1,4 +1,4 @@
-use std::{collections::HashMap, process};
+use std::{collections::HashMap, io, process};
 
 use clap::Parser;
 use helligkeit_shared::Device;
@@ -95,20 +95,32 @@ impl<'h> Helligkeit<'h> {
         self.devices.values().for_each(|d| println!("{d}"))
     }
 
-    fn set(&self, value: usize) {
+    fn set(&self, adjust: cli::Adjust) {
         let found = self.find_device();
         if found.is_empty() {
             die(format!("device {:?} not found", self.args.target));
         }
 
         for dev in found {
-            if let Err(err) = dev.set(value) {
+            let fail = |err: io::Error| -> ! {
                 die(format!(
-                    "failed to set brightness of '{}' to '{}': {}",
+                    "failed to set brightness of '{}' (max={}) to '{}': {}",
                     dev.name(),
-                    value,
+                    dev.max().map(|m| m.to_string()).unwrap_or_default(),
+                    adjust,
                     err,
                 ))
+            };
+
+            let max = dev.max().unwrap_or_else(|err| fail(err));
+            let current = if adjust.is_relative() {
+                dev.get().unwrap_or_else(|err| fail(err))
+            } else {
+                0
+            };
+
+            if let Err(err) = dev.set(adjust.resolve(current, max)) {
+                fail(err)
             }
         }
     }
