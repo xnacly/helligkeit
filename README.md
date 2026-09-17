@@ -13,7 +13,7 @@ Control linux device brightness.
 | ✅     | List supported Linux LED devices                                              |
 | ✅     | Inspect, read, and set LED brightness                                         |
 | ✅     | Select a device by exact name or substring                                    |
-| ❌     | Support Linux backlight devices                                               |
+| ✅     | Support Linux backlight devices                                               |
 | ❌     | Support DDC/CI devices                                                        |
 | ❌     | Dump and restore state from a TOML file                                       |
 | ❌     | `init` command for udev rules, user groups, and man pages                     |
@@ -57,7 +57,27 @@ exist. Load it via a file in `/etc/modules-load.d/`:
 
 ## Usage
 
-See [man](./man)
+See [man](./man) and below:
+
+```text
+Control device linux device brightness
+
+Usage: helligkeit [OPTIONS] [COMMAND]
+
+Commands:
+  info  Device info
+  get   Get current brightness of device
+  set   Set device brightness, either absolute (300), as percentage of the devices maximum (50%) or relative to the current value (+10, -5%)
+  list  List all controllable and supported devices
+  help  Print this message or the help of the given subcommand(s)
+
+Options:
+  -l, --like     Match devices by substring instead of exact name
+  -s, --silent   disable stdout/stderr writes
+  -v, --verbose
+  -h, --help     Print help
+  -V, --version  Print version
+```
 
 ## Project structure
 
