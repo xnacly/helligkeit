@@ -5,22 +5,22 @@ use clap::{Parser, Subcommand};
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
-    #[arg(short, long)]
+    #[arg(short, long, global = true)]
     /// device to operate on
-    pub target: String,
+    pub target: Option<String>,
 
-    #[arg(short, long)]
-    /// Match devices by substring matching
+    #[arg(short, long, global = true)]
+    /// Match devices by substring instead of exact name
     pub like: bool,
 
     #[command(subcommand)]
     pub command: Option<Action>,
 
     /// disable stdout/stderr writes
-    #[arg(short, long)]
+    #[arg(short, long, global = true)]
     pub silent: bool,
 
-    #[arg(short, long)]
+    #[arg(short, long, global = true)]
     pub verbose: bool,
 }
 

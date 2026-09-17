@@ -12,6 +12,7 @@ fn die(msg: impl std::fmt::Display) -> ! {
 
 struct Helligkeit<'h> {
     args: &'h cli::Cli,
+    target: String,
     devices: HashMap<String, Box<dyn Device>>,
 }
 
@@ -24,6 +25,7 @@ impl<'h> Helligkeit<'h> {
 
         Self {
             args,
+            target: args.target.clone().unwrap_or_default(),
             devices: leds
                 .map(|x| x.map(|x| Box::new(x) as Box<dyn Device>))
                 .chain(backlight.map(|x| x.map(|x| Box::new(x) as Box<dyn Device>)))
@@ -43,21 +45,17 @@ impl<'h> Helligkeit<'h> {
     }
 
     fn find_device(&self) -> Vec<&Box<dyn Device>> {
-        let cli::Cli {
-            like,
-            target: device,
-            ..
-        } = &self.args;
+        let cli::Cli { like, .. } = &self.args;
 
         if *like {
             self.devices
                 .iter()
-                .filter(|(name, _)| name.contains(device))
+                .filter(|(name, _)| name.contains(&self.target))
                 .map(|(_, d)| d)
                 .collect()
         } else {
             self.devices
-                .get(device)
+                .get(&self.target)
                 .map(|d| vec![d])
                 .unwrap_or_default()
         }
@@ -131,11 +129,19 @@ impl<'h> Helligkeit<'h> {
             return;
         };
 
-        match cmd {
-            cli::Action::Info => self.info(),
-            cli::Action::Get => self.get(),
-            cli::Action::Set { value } => self.set(*value),
-            cli::Action::List => self.list(),
+        if let cli::Action::List = cmd {
+            self.list()
+        } else {
+            if self.target.is_empty() {
+                die("info, get and set require a value for --target")
+            }
+
+            match cmd {
+                cli::Action::Info => self.info(),
+                cli::Action::Get => self.get(),
+                cli::Action::Set { value } => self.set(*value),
+                cli::Action::List => (),
+            }
         }
     }
 }
