@@ -2,10 +2,10 @@ use std::{
     fmt::Display,
     fs,
     io::{self, Write},
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
-use helligkeit_shared::{Class, Device};
+use helligkeit_shared::{Class, Device, IRRELEVANT};
 
 use crate::util;
 
@@ -26,6 +26,41 @@ pub struct Backlight {
     pub max_brightness: usize,
     /// backlight control interface, `firmware`, `platform` or `raw`
     pub kind: Option<String>,
+    /// whether a display is attached to the panel this backlight controls,
+    /// `None` if that could not be determined
+    pub connected: Option<bool>,
+}
+
+/// Resolve whether the device behind a backlight is a connected display.
+///
+/// `<backlight>/device` either points at a drm connector directly or at the gpu (nvidia). I
+/// consider a backlight connected if any connector it can be mapped to reports `connected`. Devices
+/// without drm connectors (acpi_video) yield `None`.
+fn connected(path: &Path) -> Option<bool> {
+    let device = fs::canonicalize(path.join("device")).ok()?;
+
+    // device is the connector itself
+    if let Ok(status) = fs::read_to_string(device.join("status")) {
+        return Some(status.trim() == "connected");
+    }
+
+    // device is the gpu, scan its connectors
+    let cards = fs::read_dir(device.join("drm")).ok()?;
+    let mut found = false;
+    let mut any_connected = false;
+    for card in cards.flatten() {
+        let Ok(connectors) = fs::read_dir(card.path()) else {
+            continue;
+        };
+        for connector in connectors.flatten() {
+            if let Ok(status) = fs::read_to_string(connector.path().join("status")) {
+                found = true;
+                any_connected |= status.trim() == "connected";
+            }
+        }
+    }
+
+    found.then_some(any_connected)
 }
 
 impl Device for Backlight {
@@ -38,13 +73,19 @@ impl Device for Backlight {
     }
 
     /// prefer firmware over platform over raw interfaces, see
-    /// https://www.kernel.org/doc/html/latest/gpu/backlight.html
+    /// https://www.kernel.org/doc/html/latest/gpu/backlight.html. Backlights
+    /// whose display is known to be disconnected are irrelevant
     fn rank(&self) -> u8 {
-        match self.kind.as_deref() {
+        let kind = match self.kind.as_deref() {
             Some("firmware") => 0,
             Some("platform") => 1,
             Some("raw") => 2,
             _ => 3,
+        };
+        if self.connected == Some(false) {
+            IRRELEVANT + kind
+        } else {
+            kind
         }
     }
 
@@ -76,6 +117,17 @@ impl Display for Backlight {
         if let Some(kind) = &self.kind {
             writeln!(f, "\tType: {kind}")?;
         }
+        if let Some(connected) = self.connected {
+            writeln!(
+                f,
+                "\tDisplay: {}",
+                if connected {
+                    "connected"
+                } else {
+                    "disconnected"
+                }
+            )?;
+        }
         let brightness = self.get().unwrap_or_default();
         writeln!(
             f,
@@ -103,12 +155,14 @@ impl TryFrom<PathBuf> for Backlight {
         let kind = fs::read_to_string(path.join(TYPE))
             .ok()
             .map(|s| s.trim().to_owned());
+        let connected = connected(&path);
 
         Ok(Backlight {
             name,
             path,
             max_brightness,
             kind,
+            connected,
         })
     }
 }
