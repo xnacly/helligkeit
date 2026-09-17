@@ -5,7 +5,7 @@ use std::{
     path::PathBuf,
 };
 
-use helligkeit_shared::Device;
+use helligkeit_shared::{Class, Device};
 
 use crate::util;
 
@@ -31,6 +31,21 @@ pub struct Backlight {
 impl Device for Backlight {
     fn name(&self) -> &str {
         &self.name
+    }
+
+    fn class(&self) -> Class {
+        Class::Backlight
+    }
+
+    /// prefer firmware over platform over raw interfaces, see
+    /// https://www.kernel.org/doc/html/latest/gpu/backlight.html
+    fn rank(&self) -> u8 {
+        match self.kind.as_deref() {
+            Some("firmware") => 0,
+            Some("platform") => 1,
+            Some("raw") => 2,
+            _ => 3,
+        }
     }
 
     fn get(&self) -> io::Result<usize> {

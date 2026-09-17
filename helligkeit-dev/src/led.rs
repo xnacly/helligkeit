@@ -5,7 +5,7 @@ use std::{
     path::PathBuf,
 };
 
-use helligkeit_shared::Device;
+use helligkeit_shared::{Class, Device, IRRELEVANT};
 
 use crate::util;
 
@@ -23,6 +23,26 @@ pub struct Led {
 impl Device for Led {
     fn name(&self) -> &str {
         &self.name
+    }
+
+    fn class(&self) -> Class {
+        Class::Led
+    }
+
+    /// leds are mostly keyboard indicators and network activity lights and
+    /// therefore always irrelevant. Within them keyboard backlights come
+    /// first, keyboard lock indicators driven by the kernel itself last
+    fn rank(&self) -> u8 {
+        const LOCK_INDICATORS: [&str; 5] = ["capslock", "numlock", "scrolllock", "kana", "compose"];
+
+        let function = self.name.rsplit("::").next().unwrap_or(&self.name);
+        if function == "kbd_backlight" {
+            IRRELEVANT
+        } else if LOCK_INDICATORS.contains(&function) {
+            IRRELEVANT + 2
+        } else {
+            IRRELEVANT + 1
+        }
     }
 
     fn get(&self) -> Result<usize, io::Error> {

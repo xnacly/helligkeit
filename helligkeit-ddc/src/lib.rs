@@ -2,7 +2,7 @@
 
 use std::{fmt::Display, io, path::Path};
 
-use helligkeit_shared::Device;
+use helligkeit_shared::{Class, Device};
 pub mod edid;
 
 pub struct Edid {
@@ -32,6 +32,10 @@ impl Display for Ddc {
 impl Device for Ddc {
     fn name(&self) -> &str {
         &self.edid.name
+    }
+
+    fn class(&self) -> Class {
+        Class::Ddc
     }
 
     fn get(&self) -> std::io::Result<usize> {
