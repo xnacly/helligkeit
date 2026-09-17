@@ -18,7 +18,7 @@ struct Helligkeit<'h> {
 impl<'h> Helligkeit<'h> {
     pub fn new(args: &'h cli::Cli) -> Self {
         let leds = helligkeit_dev::leds().expect("Failed to enumerate leds");
-        // let backlight = helligkeit_dev::backlight().expect("Failed to enumerate backlights");
+        let backlight = helligkeit_dev::backlight().expect("Failed to enumerate backlights");
         // let ddc = helligkeit_ddc::ddc().expect("Failed to enumerate ddc devices");
         let verbose = args.verbose;
 
@@ -26,7 +26,7 @@ impl<'h> Helligkeit<'h> {
             args,
             devices: leds
                 .map(|x| x.map(|x| Box::new(x) as Box<dyn Device>))
-                // .chain(backlight.map(|x| x.map(|x| Box::new(x) as Box<dyn Device>)))
+                .chain(backlight.map(|x| x.map(|x| Box::new(x) as Box<dyn Device>)))
                 // .chain(ddc.map(|x| x.map(|x| Box::new(x) as Box<dyn Device>)))
                 .filter_map(|result| match result {
                     Ok(device) => Some(device),
