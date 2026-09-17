@@ -8,14 +8,16 @@ Control linux device brightness.
 
 ## Features
 
-- Dump and restore device brightness to and from a toml file
-- Support devices conforming to ddci (with this, possible macos support)
-- Init subcommand to set up udev rules, user grouping and man pages
-- Doctor subcommand for checking:
-    - brightness device permissions
-    - ddci permissions
-    - user permissions
-    - udev rules
+| Status | Feature                                                                       |
+| ------ | ----------------------------------------------------------------------------- |
+| ✅     | List supported Linux LED devices                                              |
+| ✅     | Inspect, read, and set LED brightness                                         |
+| ✅     | Select a device by exact name or substring                                    |
+| ❌     | Support Linux backlight devices                                               |
+| ❌     | Support DDC/CI devices                                                        |
+| ❌     | Dump and restore state from a TOML file                                       |
+| ❌     | `init` command for udev rules, user groups, and man pages                     |
+| ❌     | `doctor` command for device, DDC/CI, user, udev and systemd permission checks |
 
 ## Installation
 
@@ -25,13 +27,33 @@ cargo install --path helligkeit
 
 ## Permissions
 
-Modifying brightness requires write permissions for device files.
-`helligkeit` accomplishes this by:
+Modifying brightness requires write permissions for device files, grant these
+to helligkeit by installing `90-helligkeit.rules` rules to add permissions to
+backlight, led and i2c devices for users in `video` and leds for users in
+`input`:
 
-1. installing relevant udev rules to add permissions to backlight class devices
-for users in `video` and leds for users in `input`.
+```sh
+sudo install -m 644 90-helligkeit.rules /etc/udev/rules.d/
+sudo udevadm control --reload
+sudo udevadm trigger
+```
 
-2. This requires your user to be in the `video` and `input` groups. (done by default)
+For DDC/CI support:
+
+- The `i2c-dev` kernel module must be loaded for the `/dev/i2c-*` nodes to
+exist. Load it via a file in `/etc/modules-load.d/`:
+
+  ```sh
+  echo i2c-dev | sudo tee /etc/modules-load.d/i2c-dev.conf
+  sudo modprobe i2c-dev
+  ```
+
+- udev rules need to be reloaded after application
+
+  ```sh
+  sudo udevadm control --reload
+  sudo udevadm trigger --subsystem-match=i2c-dev
+  ```
 
 ## Usage
 
@@ -39,13 +61,13 @@ See [man](./man)
 
 ## Project structure
 
-Helligkeit is split into 5 crates:
+Helligkeit is split into the following crates:
 
-- [ddc]()
-- [shared]()
-- [i2c]()
-- [dev]()
-- [helligkeit]()
+- [helligkeit](./helligkeit): the cli entrypoint
+- [ddc](./helligkeit-ddc): i2c based display data channel implementation
+- [dev](./helligkeit-dev): enumerating, writing and reading leds and backlights devices
+- [i2c](./helligkeit-i2c): userland inter-integrated circuit implementation
+- [shared](./helligkeit-shared): shared abstrations, types
 
 ## Name
 
