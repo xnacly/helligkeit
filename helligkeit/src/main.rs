@@ -13,7 +13,8 @@ fn die(msg: impl std::fmt::Display) -> ! {
 struct Helligkeit<'h> {
     args: &'h cli::Cli,
     target: String,
-    /// all devices sorted by (class, rank, name)
+    /// all devices sorted by (class, rank, name), the first one is the
+    /// default used when no device argument is given
     devices: Vec<Box<dyn Device>>,
 }
 
@@ -62,7 +63,12 @@ impl<'h> Helligkeit<'h> {
 
         Self {
             args,
-            target: args.target.clone().unwrap_or_default(),
+            target: args
+                .command
+                .as_ref()
+                .and_then(cli::Action::device)
+                .unwrap_or_default()
+                .to_owned(),
             devices,
         }
     }
@@ -75,6 +81,10 @@ impl<'h> Helligkeit<'h> {
                 .iter()
                 .filter(|d| d.name().contains(&self.target))
                 .collect()
+        } else if self.target.is_empty() {
+            self.devices.first().map(|d| vec![d]).unwrap_or_else(|| {
+                die("no devices found, nothing to fall back to without a device argument")
+            })
         } else {
             self.devices
                 .iter()
@@ -87,7 +97,7 @@ impl<'h> Helligkeit<'h> {
     pub fn info(&self) {
         let found = self.find_device();
         if found.is_empty() {
-            die(format!("device {:?} not found", self.args.target));
+            die(format!("device {:?} not found", self.target));
         }
 
         found.iter().for_each(|d| println!("{d}"))
@@ -96,7 +106,7 @@ impl<'h> Helligkeit<'h> {
     pub fn get(&self) {
         let found = self.find_device();
         if found.is_empty() {
-            die(format!("device {:?} not found", self.args.target));
+            die(format!("device {:?} not found", self.target));
         }
 
         for dev in found {
@@ -129,7 +139,7 @@ impl<'h> Helligkeit<'h> {
     fn set(&self, adjust: cli::Adjust) {
         let found = self.find_device();
         if found.is_empty() {
-            die(format!("device {:?} not found", self.args.target));
+            die(format!("device {:?} not found", self.target));
         }
 
         for dev in found {
@@ -162,19 +172,11 @@ impl<'h> Helligkeit<'h> {
             return;
         };
 
-        if let cli::Action::List = cmd {
-            self.list()
-        } else {
-            if self.target.is_empty() {
-                die("info, get and set require a value for --target")
-            }
-
-            match cmd {
-                cli::Action::Info => self.info(),
-                cli::Action::Get => self.get(),
-                cli::Action::Set { value } => self.set(*value),
-                cli::Action::List => (),
-            }
+        match cmd {
+            cli::Action::List => self.list(),
+            cli::Action::Info { .. } => self.info(),
+            cli::Action::Get { .. } => self.get(),
+            cli::Action::Set { value, .. } => self.set(*value),
         }
     }
 }

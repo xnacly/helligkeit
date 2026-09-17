@@ -4,7 +4,7 @@
 .SH NAME
 set \- Set device brightness, either absolute (300), as percentage of the devices maximum (50%) or relative to the current value (+10, \-5%)
 .SH SYNOPSIS
-\fBset\fR [\fB\-h\fR|\fB\-\-help\fR] <\fIVALUE\fR> 
+\fBset\fR [\fB\-h\fR|\fB\-\-help\fR] <\fIVALUE\fR> [\fIDEVICE\fR] 
 .SH DESCRIPTION
 Set device brightness, either absolute (300), as percentage of the devices maximum (50%) or relative to the current value (+10, \-5%)
 .SH OPTIONS
@@ -14,3 +14,6 @@ Print help
 .TP
 <\fIVALUE\fR>
 
+.TP
+[\fIDEVICE\fR]
+Device to operate on, defaults to the primary backlight

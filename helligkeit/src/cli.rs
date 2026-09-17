@@ -6,10 +6,6 @@ use clap::{Parser, Subcommand};
 #[command(version, about, long_about = None)]
 pub struct Cli {
     #[arg(short, long, global = true)]
-    /// device to operate on
-    pub target: Option<String>,
-
-    #[arg(short, long, global = true)]
     /// Match devices by substring instead of exact name
     pub like: bool,
 
@@ -27,14 +23,22 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Action {
     /// Device info
-    Info,
+    Info {
+        /// Device to operate on, defaults to the primary backlight
+        device: Option<String>,
+    },
     /// Get current brightness of device
-    Get,
+    Get {
+        /// Device to operate on, defaults to the primary backlight
+        device: Option<String>,
+    },
     /// Set device brightness, either absolute (300), as percentage of the
     /// devices maximum (50%) or relative to the current value (+10, -5%)
     Set {
         #[arg(allow_hyphen_values = true)]
         value: Adjust,
+        /// Device to operate on, defaults to the primary backlight
+        device: Option<String>,
     },
 
     /// List all controllable and supported devices
@@ -136,6 +140,18 @@ impl Display for Adjust {
             Adjust::Set(v) => write!(f, "{v}"),
             Adjust::Increase(v) => write!(f, "+{v}"),
             Adjust::Decrease(v) => write!(f, "-{v}"),
+        }
+    }
+}
+
+impl Action {
+    /// device the action was given, if any
+    pub fn device(&self) -> Option<&str> {
+        match self {
+            Action::Info { device } | Action::Get { device } | Action::Set { device, .. } => {
+                device.as_deref()
+            }
+            Action::List => None,
         }
     }
 }
