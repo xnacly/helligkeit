@@ -8,16 +8,14 @@ Control linux device brightness.
 
 ## Features
 
-| Status | Feature                                                                       |
-| ------ | ----------------------------------------------------------------------------- |
-| ✅     | List supported Linux LED devices                                              |
-| ✅     | Inspect, read, and set LED brightness                                         |
-| ✅     | Select a device by exact name or substring                                    |
-| ✅     | Support Linux backlight devices                                               |
-| ❌     | Support DDC/CI devices                                                        |
-| ❌     | Dump and restore state from a TOML file                                       |
-| ❌     | `init` command for udev rules, user groups, and man pages                     |
-| ❌     | `doctor` command for device, DDC/CI, user, udev and systemd permission checks |
+- List supported Linux LED, brightness and ddc/ci devices
+- Inspect, read, and set device brightness
+- Select a device by exact name or substring
+- Ranking of devices to hide "irrelevant" devices by default (like
+  `enp3s0-2::lan` or `phy0-led`), can still be shown with `--verbose`
+- Dump and restore state from a TOML file
+- `init` command for udev rules, user groups, and man pages
+- `doctor` command for device, DDC/CI, user, udev and systemd permission checks
 
 ## Installation
 
@@ -41,7 +39,7 @@ sudo udevadm trigger
 For DDC/CI support:
 
 - The `i2c-dev` kernel module must be loaded for the `/dev/i2c-*` nodes to
-exist. Load it via a file in `/etc/modules-load.d/`:
+  exist. Load it via a file in `/etc/modules-load.d/`:
 
   ```sh
   echo i2c-dev | sudo tee /etc/modules-load.d/i2c-dev.conf
